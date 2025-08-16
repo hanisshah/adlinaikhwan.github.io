@@ -1,54 +1,109 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ms">
 <head>
   <meta charset="UTF-8">
-  <title>You're Invited!</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wedding Invitation</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
-    body { font-family: 'Georgia', serif; margin: 0; padding: 0; background: #fdfdfd; color: #333; }
-    header { background: url('cover.jpg') center/cover no-repeat; height: 60vh; display: flex; align-items: center; justify-content: center; }
-    header h1 { color: #fff; font-size: 4vw; background: rgba(0,0,0,0.4); padding: 1em; }
-    .details { padding: 2em; text-align: center; }
-    .details p { margin: 0.5em 0; font-size: 1.2em; }
-    .rsvp { background: #eee; padding: 2em; text-align: center; }
-    .rsvp input, .rsvp button, .rsvp textarea { margin: 0.5em; padding: 0.8em; font-size: 1em; }
-    .rsvp input[type="text"] { width: 60%; max-width: 300px; }
-    .rsvp textarea { width: 60%; max-width: 300px; height: 100px; }
+    /* Basic styling for tabs and content */
+    body { font-family: sans-serif; margin: 0; padding: 0; }
+    nav { display: flex; background: #ececec; }
+    nav button { flex: 1; padding: 1em; border: none; background: #ddd; cursor: pointer; }
+    nav button.active { background: #bbb; }
+    section { display: none; padding: 1em; }
+    section.active { display: block; }
+    form input, form select, form button { display: block; margin: .5em 0; padding: .5em; width: 100%; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Asyraf & Aisyah</h1>
-  </header>
+  <nav>
+    <button class="tab-btn active" data-target="rsvp">RSVP</button>
+    <button class="tab-btn" data-target="contact">Contact</button>
+    <button class="tab-btn" data-target="location">Location</button>
+    <button class="tab-btn" data-target="calendar">Calendar</button>
+    <button class="tab-btn" data-target="money">Money Gift</button>
+    <button class="tab-btn" data-target="wishlist">Wishlist</button>
+  </nav>
 
-  <section class="details">
-    <p><strong>Date:</strong> 25 October 2025</p>
-    <p><strong>Time:</strong> 4 PM</p>
-    <p><strong>Venue:</strong> KL Convention Centre</p>
-    <p><strong>Address:</strong> Jalan Pinang, Kuala Lumpur, Malaysia</p>
-  </section>
-
-  <section class="rsvp">
+  <section id="rsvp" class="active">
     <h2>RSVP</h2>
     <form id="rsvpForm">
-      <input type="text" name="name" placeholder="Your Name" required><br>
-      <input type="text" name="guests" placeholder="Number of Guests" required><br>
-      <textarea name="message" placeholder="Message (optional)"></textarea><br>
-      <button type="submit">Submit</button>
+      <label>Nama Anda<input type="text" name="name" required></label>
+      <label>Hadir/Tidak Hadir 
+        <select name="status"><option>Hadir</option><option>Tidak Hadir</option></select>
+      </label>
+      <label>Slot Masa
+        <select name="slot">
+          <option>11:00–12:30</option>
+          <option>12:30–14:30</option>
+          <option>14:30–16:00</option>
+        </select>
+      </label>
+      <label>Jumlah Dewasa <input type="number" name="adult" value="1" min="0"></label>
+      <label>Jumlah Kanak-kanak <input type="number" name="kids" value="0" min="0"></label>
+      <button type="submit">Hantar</button>
+      <button type="reset">Batal</button>
     </form>
     <p id="rsvpResponse"></p>
   </section>
 
+  <section id="contact">
+    <h2>Contact</h2>
+    <p>Mariani &amp; Mazlan</p>
+  </section>
+
+  <section id="location">
+    <h2>Location</h2>
+    <p>Bukit Beruntung Golf Club, Rawang, Selangor</p>
+    <a href="https://maps.google.com" target="_blank">Google Maps</a> |
+    <a href="https://waze.com" target="_blank">Waze</a>
+  </section>
+
+  <section id="calendar">
+    <h2>Calendar</h2>
+    <a href="#" onclick="addToCalendar('google')">Add to Google Calendar</a><br>
+    <a href="#" onclick="addToCalendar('apple')">Add to Apple Calendar</a>
+  </section>
+
+  <section id="money">
+    <h2>Money Gift</h2>
+    <p>Maybank Berhad – 162076697556</p>
+    <img src="qrcode.png" alt="QR Code">
+  </section>
+
+  <section id="wishlist">
+    <h2>Wishlist</h2>
+    <div>
+      <div><img src="item1.jpg" alt="Item 1"><a href="#">Tempaℎ</a></div>
+      <div><img src="item2.jpg" alt="Item 2"><a href="#">Tempaℎ</a></div>
+    </div>
+  </section>
+
   <script>
-    document.getElementById('rsvpForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const name = this.name.value.trim();
-      const guests = this.guests.value.trim();
-      // You could send data via AJAX to your server here.
-      document.getElementById('rsvpResponse').textContent =
-        `Thank you, ${name}! We have received your RSVP for ${guests} guest(s).`;
-      this.reset();
+    // Tab navigation
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
+        document.getElementById(btn.dataset.target).classList.add('active');
+      };
     });
+
+    // RSVP form handling (client-side)
+    document.getElementById('rsvpForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const data = new FormData(e.target);
+      const name = data.get('name');
+      document.getElementById('rsvpResponse').textContent =
+        `Terima kasih, ${name}! RSVP Anda telah direkodkan.`;
+      e.target.reset();
+    });
+
+    // Stub for Add to Calendar
+    function addToCalendar(type) {
+      alert(`Implement logic to add event to ${type} calendar.`);
+    }
   </script>
 </body>
 </html>
